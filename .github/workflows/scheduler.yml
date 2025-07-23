@@ -1,0 +1,84 @@
+name: 104 Job Scraper Scheduler
+
+on:
+  schedule:
+    # 每天早上9點執行
+    - cron: "0 1 * * *" # UTC時間 01:00 = 台灣時間 09:00
+  workflow_dispatch: # 允許手動觸發
+
+jobs:
+  scrape-jobs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run scraper
+        run: |
+          python -c "
+          from scrape_104 import Job104Scraper
+          from database import JobDatabase
+          import json
+          from datetime import datetime
+
+          # 初始化
+          scraper = Job104Scraper()
+          db = JobDatabase(db_type='sqlite', db_path='jobs.db')
+
+          # 預設關鍵字
+          keywords = ['Python', 'JavaScript', '前端工程師', '後端工程師', '資料工程師']
+
+          total_scraped = 0
+          total_inserted = 0
+
+          for keyword in keywords:
+              try:
+                  print(f'爬取關鍵字: {keyword}')
+                  jobs = scraper.scrape_104(keyword=keyword, pages=2)
+                  if jobs:
+                      inserted = db.insert_jobs(jobs)
+                      total_scraped += len(jobs)
+                      total_inserted += inserted
+                      print(f'成功爬取 {len(jobs)} 筆，存入 {inserted} 筆')
+                  time.sleep(3)
+              except Exception as e:
+                  print(f'爬取 {keyword} 時發生錯誤: {e}')
+
+          # 生成報告
+          report = {
+              'date': datetime.now().isoformat(),
+              'total_scraped': total_scraped,
+              'total_inserted': total_inserted,
+              'keywords': keywords
+          }
+
+          with open('scraping_report.json', 'w', encoding='utf-8') as f:
+              json.dump(report, f, ensure_ascii=False, indent=2)
+          "
+
+      - name: Upload results
+        uses: actions/upload-artifact@v3
+        with:
+          name: scraping-results
+          path: |
+            jobs.db
+            scraping_report.json
+
+      - name: Commit results
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add jobs.db scraping_report.json
+          git commit -m "Auto-update job data $(date +'%Y-%m-%d %H:%M:%S')" || exit 0
+          git push

@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  job-scraper:
+    build: .
+    container_name: 104-job-scraper
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_ENV=production
+      - DB_TYPE=sqlite
+      - DB_PATH=/app/data/jobs.db
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/jobs/stats"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 可選：PostgreSQL資料庫（如果需要）
+  # postgres:
+  #   image: postgres:13
+  #   container_name: job-scraper-postgres
+  #   environment:
+  #     POSTGRES_DB: jobs_db
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+# volumes:
+#   postgres_data:

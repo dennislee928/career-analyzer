@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from scrape_104 import Job104Scraper
 from database import JobDatabase
+from cloudflare_d1 import create_d1_database, CloudflareD1Database
 import os
 import logging
 from datetime import datetime
@@ -15,7 +16,20 @@ CORS(app)  # 允許跨域請求
 
 # 初始化爬蟲和資料庫
 scraper = Job104Scraper()
-db = JobDatabase(db_type="sqlite", db_path="jobs.db")
+
+# 根據環境變數選擇資料庫類型
+db_type = os.getenv('DB_TYPE', 'sqlite').lower()
+
+if db_type == 'd1':
+    try:
+        db = create_d1_database()
+        logger.info("使用Cloudflare D1資料庫")
+    except Exception as e:
+        logger.warning(f"D1資料庫初始化失敗，回退到SQLite: {e}")
+        db = JobDatabase(db_type="sqlite", db_path="jobs.db")
+else:
+    db = JobDatabase(db_type="sqlite", db_path="jobs.db")
+    logger.info("使用SQLite資料庫")
 
 @app.route('/')
 def index():

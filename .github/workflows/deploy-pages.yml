@@ -1,0 +1,71 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build static files
+        run: |
+          # 創建靜態檔案目錄
+          mkdir -p docs
+
+          # 複製前端檔案
+          cp templates/index.html docs/
+
+          # 修改API URL為生產環境
+          sed -i 's|http://127.0.0.1:5001|https://your-api-domain.com|g' docs/index.html
+
+          # 創建index.html重定向
+          echo '<!DOCTYPE html>
+          <html>
+          <head>
+              <meta charset="utf-8">
+              <title>104 職缺搜尋器</title>
+              <meta http-equiv="refresh" content="0; url=./index.html">
+          </head>
+          <body>
+              <p>正在跳轉到 <a href="./index.html">104 職缺搜尋器</a>...</p>
+          </body>
+          </html>' > docs/index.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: "./docs"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

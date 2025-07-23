@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>104 職缺搜尋器 - 智能職涯分析</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .search-section {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        margin-bottom: 30px;
+      }
+
+      .search-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-group label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #555;
+      }
+
+      .form-group input,
+      .form-group select {
+        padding: 12px;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .search-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+      }
+
+      .btn {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-secondary {
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 2px solid #e9ecef;
+      }
+
+      .btn-secondary:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+      }
+
+      .stats-section {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+
+      .stat-card {
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border-radius: 10px;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+
+      .results-section {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f8f9fa;
+      }
+
+      .results-count {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #555;
+      }
+
+      .source-badge {
+        background: #28a745;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .job-grid {
+        display: grid;
+        gap: 20px;
+      }
+
+      .job-card {
+        border: 2px solid #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .job-card:hover {
+        border-color: #667eea;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+      }
+
+      .job-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .job-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #2c3e50;
+      }
+
+      .job-title a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .job-title a:hover {
+        color: #667eea;
+      }
+
+      .job-company {
+        font-size: 1.1rem;
+        color: #667eea;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .job-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .job-detail {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #6c757d;
+      }
+
+      .job-detail i {
+        color: #667eea;
+        width: 16px;
+      }
+
+      .job-salary {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        color: #d63384;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 10px;
+      }
+
+      .loader {
+        display: none;
+        text-align: center;
+        padding: 40px;
+      }
+
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #f5c6cb;
+        margin: 20px 0;
+      }
+
+      .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #c3e6cb;
+        margin: 20px 0;
+      }
+
+      .no-results {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+      }
+
+      .no-results i {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        color: #dee2e6;
+      }
+
+      @media (max-width: 768px) {
+        .search-form {
+          grid-template-columns: 1fr;
+        }
+
+        .search-buttons {
+          flex-direction: column;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .job-details {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1><i class="fas fa-search"></i> 104 職缺搜尋器</h1>
+        <p>智能職涯分析，找到最適合您的工作機會</p>
+      </div>
+
+      <div class="search-section">
+        <form id="searchForm" class="search-form">
+          <div class="form-group">
+            <label for="keywordInput"
+              ><i class="fas fa-key"></i> 搜尋關鍵字</label
+            >
+            <input
+              type="text"
+              id="keywordInput"
+              placeholder="例如: Python, 前端工程師, 資料分析師"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="areaSelect"
+              ><i class="fas fa-map-marker-alt"></i> 地區</label
+            >
+            <select id="areaSelect">
+              <option value="6001001000">台北市</option>
+              <option value="6001002000">新北市</option>
+              <option value="6001003000">桃園市</option>
+              <option value="6001004000">台中市</option>
+              <option value="6001005000">台南市</option>
+              <option value="6001006000">高雄市</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="pagesInput"
+              ><i class="fas fa-file-alt"></i> 搜尋頁數</label
+            >
+            <input type="number" id="pagesInput" min="1" max="10" value="2" />
+          </div>
+
+          <div class="form-group">
+            <label for="experienceSelect"
+              ><i class="fas fa-clock"></i> 工作經歷</label
+            >
+            <select id="experienceSelect">
+              <option value="">不限</option>
+              <option value="1y">1年以上</option>
+              <option value="3y">3年以上</option>
+              <option value="5y">5年以上</option>
+            </select>
+          </div>
+        </form>
+
+        <div class="search-buttons">
+          <button type="button" id="searchBtn" class="btn btn-primary">
+            <i class="fas fa-search"></i> 搜尋職缺
+          </button>
+          <button type="button" id="recentBtn" class="btn btn-secondary">
+            <i class="fas fa-clock"></i> 最近職缺
+          </button>
+          <button type="button" id="statsBtn" class="btn btn-secondary">
+            <i class="fas fa-chart-bar"></i> 統計資訊
+          </button>
+        </div>
+      </div>
+
+      <div class="stats-section" id="statsSection" style="display: none">
+        <h3><i class="fas fa-chart-bar"></i> 統計資訊</h3>
+        <div class="stats-grid" id="statsGrid">
+          <!-- 統計資料將在這裡動態載入 -->
+        </div>
+      </div>
+
+      <div class="results-section" id="resultsSection" style="display: none">
+        <div class="results-header">
+          <div class="results-count" id="resultsCount"></div>
+          <div class="source-badge" id="sourceBadge"></div>
+        </div>
+
+        <div class="loader" id="loader">
+          <div class="spinner"></div>
+          <p>正在搜尋職缺中，請稍候...</p>
+        </div>
+
+        <div class="job-grid" id="jobGrid">
+          <!-- 職缺卡片將在這裡動態載入 -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "http://127.0.0.1:5001/api";
+
+      // DOM 元素
+      const searchBtn = document.getElementById("searchBtn");
+      const recentBtn = document.getElementById("recentBtn");
+      const statsBtn = document.getElementById("statsBtn");
+      const keywordInput = document.getElementById("keywordInput");
+      const areaSelect = document.getElementById("areaSelect");
+      const pagesInput = document.getElementById("pagesInput");
+      const experienceSelect = document.getElementById("experienceSelect");
+      const resultsSection = document.getElementById("resultsSection");
+      const statsSection = document.getElementById("statsSection");
+      const loader = document.getElementById("loader");
+      const jobGrid = document.getElementById("jobGrid");
+      const resultsCount = document.getElementById("resultsCount");
+      const sourceBadge = document.getElementById("sourceBadge");
+      const statsGrid = document.getElementById("statsGrid");
+
+      // 事件監聽器
+      searchBtn.addEventListener("click", performSearch);
+      recentBtn.addEventListener("click", loadRecentJobs);
+      statsBtn.addEventListener("click", loadStats);
+      keywordInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") performSearch();
+      });
+
+      // 搜尋職缺
+      async function performSearch() {
+        const keyword = keywordInput.value.trim();
+        if (!keyword) {
+          showMessage("請輸入搜尋關鍵字！", "error");
+          return;
+        }
+
+        showLoader();
+        hideMessage();
+        hideStats();
+
+        try {
+          const params = new URLSearchParams({
+            keyword: keyword,
+            area: areaSelect.value,
+            pages: pagesInput.value,
+            experience: experienceSelect.value || "",
+          });
+
+          const response = await fetch(`${API_BASE_URL}/search?${params}`);
+          const result = await response.json();
+
+          if (result.status === "success") {
+            displayJobs(result.data, result.count, result.source);
+          } else {
+            showMessage(result.message || "搜尋失敗", "error");
+          }
+        } catch (error) {
+          console.error("搜尋失敗:", error);
+          showMessage("發生錯誤，請檢查後端伺服器是否已啟動。", "error");
+        } finally {
+          hideLoader();
+        }
+      }
+
+      // 載入最近職缺
+      async function loadRecentJobs() {
+        showLoader();
+        hideMessage();
+        hideStats();
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/jobs/recent`);
+          const result = await response.json();
+
+          if (result.status === "success") {
+            displayJobs(result.data, result.count, "database");
+          } else {
+            showMessage(result.message || "載入失敗", "error");
+          }
+        } catch (error) {
+          console.error("載入最近職缺失敗:", error);
+          showMessage("發生錯誤，請檢查後端伺服器是否已啟動。", "error");
+        } finally {
+          hideLoader();
+        }
+      }
+
+      // 載入統計資訊
+      async function loadStats() {
+        hideMessage();
+        hideResults();
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/jobs/stats`);
+          const result = await response.json();
+
+          if (result.status === "success") {
+            displayStats(result.stats);
+          } else {
+            showMessage(result.message || "載入統計資訊失敗", "error");
+          }
+        } catch (error) {
+          console.error("載入統計資訊失敗:", error);
+          showMessage("發生錯誤，請檢查後端伺服器是否已啟動。", "error");
+        }
+      }
+
+      // 顯示職缺
+      function displayJobs(jobs, count, source) {
+        resultsSection.style.display = "block";
+        resultsCount.textContent = `找到 ${count} 筆職缺`;
+        sourceBadge.textContent = source === "database" ? "資料庫" : "即時爬取";
+
+        if (jobs.length === 0) {
+          jobGrid.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3>找不到相關職缺</h3>
+                        <p>請嘗試其他關鍵字或搜尋條件</p>
+                    </div>
+                `;
+          return;
+        }
+
+        jobGrid.innerHTML = jobs
+          .map(
+            (job) => `
+                <div class="job-card">
+                    <h3 class="job-title">
+                        <a href="https://www.104.com.tw${
+                          job.jobUrl
+                        }" target="_blank">
+                            ${job.jobName}
+                        </a>
+                    </h3>
+                    <div class="job-company">
+                        <i class="fas fa-building"></i> ${job.custName}
+                    </div>
+                    <div class="job-details">
+                        <div class="job-detail">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${job.jobAddrNoDesc || "未指定"}</span>
+                        </div>
+                        <div class="job-detail">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>${job.edu || "未指定"}</span>
+                        </div>
+                        <div class="job-detail">
+                            <i class="fas fa-briefcase"></i>
+                            <span>${job.workExp || "未指定"}</span>
+                        </div>
+                        ${
+                          job.remoteWork
+                            ? `
+                        <div class="job-detail">
+                            <i class="fas fa-home"></i>
+                            <span>可遠端工作</span>
+                        </div>
+                        `
+                            : ""
+                        }
+                    </div>
+                    ${
+                      job.salaryDesc
+                        ? `<div class="job-salary">${job.salaryDesc}</div>`
+                        : ""
+                    }
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      // 顯示統計資訊
+      function displayStats(stats) {
+        statsSection.style.display = "block";
+        statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${stats.total_jobs}</div>
+                    <div class="stat-label">總職缺數</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.recent_jobs}</div>
+                    <div class="stat-label">最近7天新增</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${new Date(
+                      stats.last_updated
+                    ).toLocaleDateString()}</div>
+                    <div class="stat-label">最後更新</div>
+                </div>
+            `;
+      }
+
+      // 工具函數
+      function showLoader() {
+        loader.style.display = "block";
+      }
+
+      function hideLoader() {
+        loader.style.display = "none";
+      }
+
+      function showMessage(message, type) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className =
+          type === "error" ? "error-message" : "success-message";
+        messageDiv.innerHTML = `<i class="fas fa-${
+          type === "error" ? "exclamation-triangle" : "check-circle"
+        }"></i> ${message}`;
+
+        // 移除舊的訊息
+        hideMessage();
+
+        // 插入新訊息
+        document.querySelector(".search-section").appendChild(messageDiv);
+      }
+
+      function hideMessage() {
+        const messages = document.querySelectorAll(
+          ".error-message, .success-message"
+        );
+        messages.forEach((msg) => msg.remove());
+      }
+
+      function hideResults() {
+        resultsSection.style.display = "none";
+      }
+
+      function hideStats() {
+        statsSection.style.display = "none";
+      }
+
+      // 頁面載入時顯示歡迎訊息
+      window.addEventListener("load", () => {
+        showMessage("歡迎使用104職缺搜尋器！請輸入關鍵字開始搜尋。", "success");
+      });
+    </script>
+  </body>
+</html>

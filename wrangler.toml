@@ -1,0 +1,31 @@
+name = "104-job-scraper"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[env.production]
+name = "104-job-scraper-prod"
+
+[env.staging]
+name = "104-job-scraper-staging"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "104-jobs"
+database_id = "845a885d-2722-4b74-9f50-e404d02216f3"
+
+[env.production.d1_databases]
+binding = "DB"
+database_name = "104-jobs-prod"
+database_id = "845a885d-2722-4b74-9f50-e404d02216f3"
+
+[env.staging.d1_databases]
+binding = "DB"
+database_name = "104-jobs-staging"
+database_id = "845a885d-2722-4b74-9f50-e404d02216f3"
+
+[triggers]
+crons = [
+  "0 1 * * *",  # 每天UTC 01:00 (台灣時間09:00)
+  "0 7 * * *",  # 每天UTC 07:00 (台灣時間15:00)
+  "0 18 * * 0"  # 每週日UTC 18:00 (台灣時間週一02:00)
+] 

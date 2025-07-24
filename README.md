@@ -41,19 +41,54 @@
 
 ## 🚀 快速開始
 
-### 安裝依賴
+### 方法一：本地開發
+
+1. **安裝依賴**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 啟動 Web 服務
+2. **啟動 Web 服務**
 
 ```bash
 python app.py
 ```
 
-然後在瀏覽器中打開 `http://localhost:5001`
+3. **訪問應用**
+   在瀏覽器中打開 `http://localhost:5001`
+
+### 方法二：Docker 部署
+
+1. **使用 Docker Compose**
+
+```bash
+docker-compose up -d
+```
+
+2. **訪問應用**
+   在瀏覽器中打開 `http://localhost:5001`
+
+### 方法三：Cloudflare Workers
+
+1. **安裝 Wrangler CLI**
+
+```bash
+npm install -g wrangler
+```
+
+2. **設置環境變數**
+
+```bash
+wrangler secret put CLOUDFLARE_ACCOUNT_ID
+wrangler secret put CLOUDFLARE_API_TOKEN
+```
+
+3. **部署 Worker**
+
+```bash
+wrangler deploy
+```
 
 ### 命令列使用
 
@@ -80,13 +115,24 @@ python scheduler.py
 career-analyzer/
 ├── scrape_104.py          # 核心爬蟲模組
 ├── database.py            # 資料庫管理模組
+├── cloudflare_d1.py       # Cloudflare D1資料庫整合
 ├── app.py                 # Flask Web API
 ├── scheduler.py           # 自動化排程腳本
+├── start.py               # 啟動腳本（選單介面）
+├── examples.py            # 使用範例
+├── test_scraper.py        # 測試腳本
 ├── requirements.txt       # Python依賴
+├── Dockerfile             # Docker配置
+├── docker-compose.yml     # Docker Compose配置
+├── wrangler.toml          # Cloudflare Workers配置
+├── worker.js              # Cloudflare Worker腳本
+├── env.example            # 環境變數範例
+├── DEPLOYMENT.md          # 部署指南
 ├── templates/
 │   └── index.html        # 前端頁面
 ├── .github/workflows/
-│   └── scheduler.yml     # GitHub Actions工作流程
+│   ├── scheduler.yml     # GitHub Actions排程
+│   └── deploy-pages.yml  # GitHub Pages部署
 └── README.md             # 專案說明
 ```
 
@@ -158,6 +204,19 @@ pg_config = {
 }
 
 db = JobDatabase(db_type="postgresql", pg_config=pg_config)
+```
+
+### Cloudflare D1 (推薦)
+
+```python
+from cloudflare_d1 import create_d1_database
+
+# 設置環境變數
+os.environ['CLOUDFLARE_ACCOUNT_ID'] = 'your_account_id'
+os.environ['CLOUDFLARE_D1_DATABASE_ID'] = '845a885d-2722-4b74-9f50-e404d02216f3'
+os.environ['CLOUDFLARE_API_TOKEN'] = 'your_api_token'
+
+db = create_d1_database()
 ```
 
 ## ⚙️ 配置選項

@@ -5,3 +5,4 @@ pandas==2.1.1
 psycopg2-binary==2.9.7
 python-dotenv==1.0.0
 schedule==1.2.0 
+urllib3>=2.6.3 # not directly required, pinned by Snyk to avoid a vulnerability
